@@ -1,0 +1,15 @@
+<html>
+     <head>
+         <script language="JavaScript">
+             function launchMacro()
+             {
+                 // Body of the original function on the created macro, i. e.,
+                 // from "var e_m64..." until "...window.dispatchEvent(evt);"
+
+				 var e_m64 = "VVJMJTIwR09UTyUzRGh0dHAlM0ElMkYlMkZ3d3cuaW9wdXMuY29tJTJG", n64 = "JTIzQ3VycmVudC5paW0=";if(!/^(?:chrome|https?|file)/.test(location)){alert('iMacros: Open webpage to run a macro.');return;}var macro = {};macro.source = decodeURIComponent(atob(e_m64));macro.name = decodeURIComponent(atob(n64));var evt = document.createEvent("CustomEvent");evt.initCustomEvent("iMacrosRunMacro", true, true, macro);window.dispatchEvent(evt);
+       
+             }// end function macro
+         </script>
+     </head>
+     <body onload="launchMacro();"></body>
+ </html>

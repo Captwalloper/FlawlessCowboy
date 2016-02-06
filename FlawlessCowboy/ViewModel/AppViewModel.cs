@@ -36,9 +36,6 @@ namespace FlawlessCowboy.ViewModel
                 case CortanaCommand.Execute:
                     break;
 
-                case CortanaCommand.Notepad:
-                    break;
-
                 // ...
             }
         }

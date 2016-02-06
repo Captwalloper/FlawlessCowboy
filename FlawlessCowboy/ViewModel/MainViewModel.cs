@@ -67,7 +67,7 @@ namespace FlawlessCowboy.ViewModel
         {
             get
             {
-                return _launchCommand ?? ( _launchCommand = new Command( Unseal_The_Hushed_Casket ) );
+                return _launchCommand ?? (_launchCommand = new Command(Test));
             }
             protected set
             {
@@ -85,11 +85,6 @@ namespace FlawlessCowboy.ViewModel
         public override async Task RespondToVoice(CortanaCommand command)
         {
             await command.Perform();
-            // update UI
-            RawText = command.RawText;
-            CommandMode = command.Mode;
-            CommandName = command.Name;
-            CommandArg = command.Argument;
         }
 
         private static string Sanitize(string inputString)
@@ -97,34 +92,13 @@ namespace FlawlessCowboy.ViewModel
             return inputString.Trim();
         }
 
-        private async Task Launch(string filename)
+        private static async void Test()
         {
-            await FileHelper.Run(filename);
-        }
-
-        /// <summary>
-        /// Hook for tutorial. Currently demo for Cole Protocol text command, sandwiched by cutscenes. Satisfies programmer's need for Halo references. 
-        /// </summary>
-        private async void Unseal_The_Hushed_Casket()
-        {
-            // Yes, the timings are terrible hacks... but this was only meant to be a neat hook.
-            const string cutscene1 = "Unseal_The_Hushed_Casket_p1.mp4";
-            const int cutscene1_ms = 28000;
-            await FileHelper.PlayFor(cutscene1, cutscene1_ms);
-
-            /*Run the Demo*/
-            await RunDemo();
-
-            const string cutscene2 = "Unseal_The_Hushed_Casket_p2.mp4";
-            const int cutscene2_ms = 28000;
-            await FileHelper.PlayFor(cutscene2, cutscene2_ms);
-        }
-
-        private async Task RunDemo()
-        {
-            var execute_command = new ExecuteCortanaCommand("Cole Protocol");
-            await Cortana.RunAsTextCommand(execute_command);
-            await Task.Delay(10000);
+            const string filename = "sample.txt";
+            //await FileHelper.CreateFile(filename);
+            //await FileHelper.WriteTo(filename, "booyah");
+            string text = await FileHelper.ReadFrom(filename);
+            await PopupHelper.ShowPopup(text);
         }
 
 
