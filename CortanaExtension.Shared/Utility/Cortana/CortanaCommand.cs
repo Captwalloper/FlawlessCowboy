@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Media.SpeechRecognition;
+using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace CortanaExtension.Shared.Utility.Cortana
 {
@@ -23,6 +24,11 @@ namespace CortanaExtension.Shared.Utility.Cortana
             Argument = argument;
 
             OrganizeFeedback(diagnostics);
+        }
+
+        protected CortanaCommand(string name)
+        {
+            Name = name;
         }
 
         public abstract Task Perform();
@@ -77,7 +83,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         {
             string filename = Argument;
             string properFilename = FileHelper.ConvertToProperFilename(filename);
-            await FileHelper.Launch(properFilename);
+            await FileHelper.Launch(properFilename, await StorageFolders.ResourceFiles());
         }
     }
 
@@ -88,7 +94,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         public override async Task Perform()
         {
             string properFilename = "Cortana_Settings.ahk";
-            await FileHelper.Launch(properFilename);
+            await FileHelper.Launch(properFilename, await StorageFolders.ResourceFiles());
         }
     }
 

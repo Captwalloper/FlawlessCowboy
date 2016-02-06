@@ -1,20 +1,28 @@
-﻿using CortanaExtension.Shared.Utility.Cortana;
+﻿using CortanaExtension.Shared.Model;
+using CortanaExtension.Shared.Utility;
+using CortanaExtension.Shared.Utility.Cortana;
 using FlawlessCowboy.View;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace FlawlessCowboy
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application
+    public partial class App : Application, IModelHolder
     {
+        private const string modelFileName = "Model.txt";
+
+        public SharedModel Model { get; set; }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -38,11 +46,19 @@ namespace FlawlessCowboy
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             CustomizeDebugSettings();
             InitializeFrame(e);
-            Cortana.Setup();
+            await Cortana.Setup(this);
+            try
+            {
+                await Load();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         protected override void OnActivated(IActivatedEventArgs e)
@@ -110,6 +126,18 @@ namespace FlawlessCowboy
             Window.Current.Activate();
         }
 
+        private async Task Save()
+        {
+            string json = Serializer.Serialize(Model);
+            await FileHelper.WriteTo(modelFileName, await StorageFolders.ResourceFiles(), json);
+        }
+
+        private async Task Load()
+        {
+            string json = await FileHelper.ReadFrom(modelFileName, await StorageFolders.ResourceFiles());
+            Model = Serializer.Deserialize<SharedModel>(json);
+        }
+
         /// <summary>
         /// Invoked when application execution is being suspended.  Application state is saved
         /// without knowing whether the application will be terminated or resumed with the contents
@@ -117,10 +145,13 @@ namespace FlawlessCowboy
         /// of memory still intact.
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
+
             //TODO: Save application state and stop any background activity
+            await Save();
+
             deferral.Complete();
         }
 

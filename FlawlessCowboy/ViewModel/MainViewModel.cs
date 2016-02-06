@@ -3,6 +3,7 @@ using CortanaExtension.Shared.Utility;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using FlawlessCowboy.View;
+using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace FlawlessCowboy.ViewModel
 {
@@ -97,7 +98,7 @@ namespace FlawlessCowboy.ViewModel
             const string filename = "sample.txt";
             //await FileHelper.CreateFile(filename);
             //await FileHelper.WriteTo(filename, "booyah");
-            string text = await FileHelper.ReadFrom(filename);
+            string text = await FileHelper.ReadFrom(filename, StorageFolders.LocalFolder);
             await PopupHelper.ShowPopup(text);
         }
 

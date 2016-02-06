@@ -1,14 +1,23 @@
-﻿using System;
+﻿using CortanaExtension.Shared.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
 using Windows.Storage;
+using Windows.UI.Xaml;
 using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace CortanaExtension.Shared.Utility.Cortana
 {
+    public interface IModelHolder
+    {
+        SharedModel Model { get; }
+    }
+
     public static class Cortana
     {
         /// <summary>
@@ -16,10 +25,12 @@ namespace CortanaExtension.Shared.Utility.Cortana
         /// </summary>
         private const string vcdFilename = "CortanaCommands.xml";
 
-        public static async void Setup()
+        private static IModelHolder ModelHolder;
+
+        public static async Task Setup(IModelHolder modelHolder=null)
         {
+            ModelHolder = modelHolder;
             await InstallVoiceCommands();
-            //var folders = (await Package.Current.InstalledLocation.GetFoldersAsync()).To‌​List();
             await InstallPhrases();
         }
 
@@ -35,7 +46,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
             return ProcessCommand(speechRecognitionResult, diagnostics);
         }
 
-        public static CortanaCommand ProcessCommand(SpeechRecognitionResult speechRecognitionResult, CommandDiagnostics commandArgs)
+        public static CortanaCommand ProcessCommand(SpeechRecognitionResult speechRecognitionResult, CommandDiagnostics diagnostics)
         {
             // Get the name of the voice command and the text spoken
             string voiceCommandName = speechRecognitionResult.RulePath[0];
@@ -43,15 +54,25 @@ namespace CortanaExtension.Shared.Utility.Cortana
 
             string argument = null;
             CortanaCommand processedCommand = null;
+
+            bool modelUsed = ModelHolder != null;
+            if (modelUsed) {
+                UserCortanaCommand userCommand = ProcessUserCommand(voiceCommandName, speechRecognitionResult, diagnostics);
+                bool wasUserCommand = userCommand != null;
+                if (wasUserCommand) {
+                    return userCommand;
+                }
+            }
+
             switch (voiceCommandName)
             {
                 case CortanaCommand.Execute:
                     argument = GetPhraseArg(speechRecognitionResult, "filename"); // filename
-                    processedCommand = new ExecuteCortanaCommand(argument, commandArgs);
+                    processedCommand = new ExecuteCortanaCommand(argument, diagnostics);
                     break;
 
                 case CortanaCommand.ToggleListening:
-                    processedCommand = new ToggleListeningCortanaCommand(null, commandArgs); // no argument needed
+                    processedCommand = new ToggleListeningCortanaCommand(null, diagnostics); // no argument needed
                     break;
 
                 default:
@@ -59,6 +80,20 @@ namespace CortanaExtension.Shared.Utility.Cortana
                     break;
             }
             return processedCommand;
+        }
+
+        public static UserCortanaCommand ProcessUserCommand(string voiceCommandName, SpeechRecognitionResult speechRecognitionResult, CommandDiagnostics commandArgs)
+        {
+            SharedModel model = ModelHolder.Model;
+            UserCortanaCommand command = null;
+            if (model != null) {
+                IList<UserCortanaCommand> commands = model.UserCortanaCommands;
+                command = commands.Where( c => c.Name.Equals(voiceCommandName) ).First();
+                if (command != null) {
+                    command = command.Spawn(speechRecognitionResult);
+                }
+            }
+            return command;
         }
 
         /// <summary>
