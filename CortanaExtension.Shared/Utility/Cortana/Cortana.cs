@@ -1,13 +1,11 @@
-﻿using CortanaExtension.Shared.Utility.Cortana;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
 using Windows.Storage;
+using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace CortanaExtension.Shared.Utility.Cortana
 {
@@ -73,7 +71,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
             ClipboardHelper.CopyToClipboard(rawInput);
             // Run the closest thing to Cortana command line I have
             const string filename = "Cortanahk.ahk";
-            await FileHelper.Launch(filename);
+            await FileHelper.Launch(filename, await StorageFolders.ResourceFiles());
         }
 
         /// <summary>
@@ -81,7 +79,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         /// </summary>
         private static async Task InstallVoiceCommands()
         {
-            StorageFile file = await Package.Current.InstalledLocation.GetFileAsync(vcdFilename);
+            StorageFile file = await StorageFolders.FlawlessCowboy.GetFileAsync(vcdFilename);
             await VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(file);
         }
 
@@ -93,7 +91,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         private static async Task InstallFilenamePhrase()
         {
             // Get the names of the files of interest (right now, the autohotkey files in the resource folder)
-            string[] filenames = await FileHelper.GetFiles(FileHelper.resourceFolderName, ".ahk");
+            string[] filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles(), ".ahk");
 
             // colloquialize (so you don't have to say the underscore(s) and extension aloud)
             for (int i = 0; i < filenames.Length; i++)

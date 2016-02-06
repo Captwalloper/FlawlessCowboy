@@ -18,9 +18,9 @@ namespace CortanaExtension.Shared.Utility
         public const string sharedModelPathRelative = @"CortanaExtension.Shared\Model";
         public const string resourcePathRelative = sharedModelPathRelative + @"\" + resourceFolderName;
 
-        public static async Task<bool> Launch(string filename)
+        public static async Task<bool> Launch(string filename, StorageFolder folder)
         {
-            IStorageFile file = await FileIO.GetFile(filename);
+            IStorageFile file = await folder.GetFileAsync(filename);
 
             LauncherOptions options = new LauncherOptions();
             //options.DisplayApplicationPicker = true;
@@ -30,49 +30,48 @@ namespace CortanaExtension.Shared.Utility
             return result;
         }
 
-        public static async Task CreateFile(string filename)
+        public static async Task CreateFile(string filename, StorageFolder folder)
         {
             // Create sample file; replace if exists.
-            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            StorageFile sampleFile = await storageFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
+            StorageFile sampleFile = await folder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
         }
 
-        public static async Task WriteTo(string filename, string content)
+        public static async Task WriteTo(string filename, StorageFolder folder, string content)
         {
-            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(filename);
+            StorageFile file = await folder.GetFileAsync(filename);
             await FileIO.SaveText(file, content);
         }
 
-        public static async Task<string> ReadFrom(string filename)
+        public static async Task<string> ReadFrom(string filename, StorageFolder folder)
         {
-            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(filename);
+            StorageFile file = await folder.GetFileAsync(filename);
             return await FileIO.LoadText(file);
         }
 
-        public static async Task<IStorageFile> GetFile(string filename)
+        public static async Task<IStorageFile> GetFile(string filename, StorageFolder folder)
         {
-            IStorageFile file = await FileIO.GetFile(filename);
+            IStorageFile file = await folder.GetFileAsync(filename);
             return file;
         }
 
-        public static async Task<string[]> GetFiles(string folderName, string extension)
+        public static async Task<string[]> GetFiles(StorageFolder folder, string extension)
         {
-            return await FileIO.GetFiles(folderName, extension);
+            return await FileIO.GetFiles(folder, extension);
         }
 
         public static async Task CloseActive()
         {
-            await Launch("CloseActiveFile.ahk");
+            await Launch("CloseActiveFile.ahk", await StorageFolders.ResourceFiles());
         }
 
         public static async Task MaximizeActive()
         {
-            await Launch("Maximize.ahk");
+            await Launch("Maximize.ahk", await StorageFolders.ResourceFiles());
         }
 
         public static async Task PlayFor(string filename, int msToPlayFor)
         {
-            await Launch(filename);
+            await Launch(filename, await StorageFolders.ResourceFiles());
             await MaximizeActive();
             await Task.Delay(msToPlayFor);
             await CloseActive();
@@ -112,11 +111,11 @@ namespace CortanaExtension.Shared.Utility
         public class StorageFolders
         {
             public static readonly StorageFolder FlawlessCowboy = Package.Current.InstalledLocation;
-            public static readonly StorageFolder LocalData = ApplicationData.Current.LocalFolder;
+            public static readonly StorageFolder LocalFolder = ApplicationData.Current.LocalFolder;
 
             public static async Task<StorageFolder> ResourceFiles()
             {
-                return await FlawlessCowboy.GetFolderAsync("");
+                return await FlawlessCowboy.GetFolderAsync(FileHelper.resourcePathRelative);
             }
         }
 

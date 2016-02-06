@@ -11,26 +11,11 @@ namespace CortanaExtension.Shared.Utility
     class FileIO
     {
 
-        public static async Task<IStorageFile> GetFile(string filename)
-        {
-            Uri uri = GetUri(filename);
-            IStorageFile file = await StorageFile.GetFileFromApplicationUriAsync(uri);
-            return file;
-        }
-
-        public static async Task<StorageFolder> GetDirectory(string name)
-        {
-            StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
-            StorageFolder dir = await installedLocation.GetFolderAsync(name);
-            return dir;
-        }
-
-        public static async Task<string[]> GetFiles(string folderName)
+        public static async Task<string[]> GetFiles(StorageFolder dir)
         {
             string[] filenames = null;
             try
             {
-                StorageFolder dir = await GetDirectory(FileHelper.sharedModelPathRelative + @"\" + folderName);
                 var files = await dir.GetFilesAsync();
                 IList<string> names = new List<string>();
                 foreach (StorageFile file in files)
@@ -48,9 +33,9 @@ namespace CortanaExtension.Shared.Utility
             return filenames;
         }
 
-        public static async Task<string[]> GetFiles(string folderName, string extension)
+        public static async Task<string[]> GetFiles(StorageFolder dir, string extension)
         {
-            string[] filenames = await GetFiles(FileHelper.resourceFolderName);
+            string[] filenames = await GetFiles(dir);
 
             // filter out files not of the specified extension
             IList<string> filenamesOfSpecifiedExtension = new List<string>();
@@ -72,14 +57,6 @@ namespace CortanaExtension.Shared.Utility
         public static async Task<string> LoadText(IStorageFile file)
         {
             return await Windows.Storage.FileIO.ReadTextAsync(file);
-        }
-
-        private static Uri GetUri(string filename)
-        {
-            string filepath = FileHelper.resourcePathRelative + @"\" + filename;
-
-            Uri uri = new Uri(@"ms-appx:///" + filepath);
-            return uri;
         }
 
     }
