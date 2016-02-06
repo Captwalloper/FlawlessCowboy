@@ -31,7 +31,16 @@
 
         <!-- Action Sequence -->
         <Border Grid.Column="0">
-            <ListView ItemsSource="{Binding ComponentTasks}">
+            <ListView x:Name="ActionSequence" ItemsSource="{Binding ComponentTasks}"
+                        MinWidth="100"
+                        SelectionMode="Extended"
+                        AllowDrop="True" 
+                        CanReorderItems="True" 
+                        CanDragItems="True"
+                        DragOver="TargetListView_DragOver"
+                        Drop="TargetListView_Drop"
+                        DragItemsStarting="SourceListView_DragItemsStarting"
+                        DragItemsCompleted="TargetListView_DragItemsCompleted">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
@@ -43,19 +52,51 @@
 
         <!-- Edit Panel -->
         <Border Grid.Column="1">
-            <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <TextBlock Text="Action Editor" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <local:Entry Label="Name:" Value="{Binding Task.Name, Mode=TwoWay}" HorizontalAlignment="Center"/>
-                <Button HorizontalAlignment="Center"
-                        Content="Create New" />
-                <Button HorizontalAlignment="Center"
-                        Content="Confirm" />
-            </StackPanel>
+            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="Action Editor" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <local:Entry Label="Name:" Value="{Binding Task.Name, Mode=TwoWay}" HorizontalAlignment="Center"/>
+                    <Button HorizontalAlignment="Center"
+                            Content="Create New" />
+                    <Button HorizontalAlignment="Center"
+                            Content="Confirm" />
+                </StackPanel>
+
+
+                <StackPanel Grid.Row="2">
+                    <TextBlock 
+                    VerticalAlignment="Bottom"
+                    Text="Drop items here to remove them from Selection"
+                    TextWrapping="Wrap"/>
+                    <TextBlock x:Name="TargetTextBlock" HorizontalAlignment="Center"
+                        AllowDrop="True"
+                        DragEnter="TargetTextBlock_DragEnter"
+                        Drop="TargetTextBlock_Drop"
+                        FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" FontSize="50" />
+                </StackPanel>
+                
+            </Grid>
         </Border>
 
         <!-- Action Picker -->
         <Border Grid.Column="2">
-            <ListView ItemsSource="{Binding AvailableTasks}">
+            <ListView x:Name="ActionPicker" ItemsSource="{Binding AvailableTasks}"
+                        AllowDrop="True" 
+                        CanReorderItems="True" 
+                        CanDragItems="True"
+                        DragOver="TargetListView_DragOver"
+                        Drop="TargetListView_Drop"
+                        DragItemsStarting="SourceListView_DragItemsStarting"
+                        DragItemsCompleted="TargetListView_DragItemsCompleted">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>

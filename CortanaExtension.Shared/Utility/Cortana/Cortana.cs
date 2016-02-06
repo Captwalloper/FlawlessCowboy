@@ -55,14 +55,14 @@ namespace CortanaExtension.Shared.Utility.Cortana
             string argument = null;
             CortanaCommand processedCommand = null;
 
-            bool modelUsed = ModelHolder != null;
-            if (modelUsed) {
-                UserCortanaCommand userCommand = ProcessUserCommand(voiceCommandName, speechRecognitionResult, diagnostics);
-                bool wasUserCommand = userCommand != null;
-                if (wasUserCommand) {
-                    return userCommand;
-                }
-            }
+            //bool modelUsed = ModelHolder != null;
+            //if (modelUsed) {
+            //    UserCortanaCommand userCommand = ProcessUserCommand(voiceCommandName, speechRecognitionResult, diagnostics);
+            //    bool wasUserCommand = userCommand != null;
+            //    if (wasUserCommand) {
+            //        return userCommand;
+            //    }
+            //}
 
             switch (voiceCommandName)
             {

@@ -1,5 +1,6 @@
 ﻿using CortanaExtension.Shared.Model;
 using CortanaExtension.Shared.Utility.Cortana;
+using CortanaExtension.Utility;
 using FlawlessCowboy.ViewModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

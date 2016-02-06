@@ -134,6 +134,7 @@
     <Compile Include="Utility\Cortana\CommandDiagnostics.cs" />
     <Compile Include="Utility\Cortana\Cortana.cs" />
     <Compile Include="Utility\Cortana\CortanaCommand.cs" />
+    <Compile Include="Utility\DragDropHelper.cs" />
     <Compile Include="Utility\FileHelper.cs" />
     <Compile Include="Utility\FileIO.cs" />
     <Compile Include="Utility\PopupHelper.cs" />
@@ -143,6 +144,7 @@
     </Content>
     <Content Include="Properties\CortanaExtension.Shared.rd.xml" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

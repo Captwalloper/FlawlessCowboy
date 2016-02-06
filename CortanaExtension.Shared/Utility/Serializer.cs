@@ -24,16 +24,22 @@ namespace CortanaExtension.Shared.Utility
             return jsonString;
         }
 
-        public static T Deserialize<T>(string jsonString) where T : class
+        public static T Deserialize<T>(string jsonString)
         {
             DataContractJsonSerializer jsonizer = new DataContractJsonSerializer(typeof(T));
-            T obj = null;
+            T obj;
             using (Stream stream = GenerateStreamFromString(jsonString))
             {
                 obj = (T)jsonizer.ReadObject(stream);
             }
             return obj;
         }
+
+        //public static string GetAttribute(string attributeName, string json)
+        //{
+        //    DataContractJsonSerializer jsonizer = new DataContractJsonSerializer(typeof(object));
+        //    jsonizer.
+        //}
 
         private static Stream GenerateStreamFromString(string s)
         {

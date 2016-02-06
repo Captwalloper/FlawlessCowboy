@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CortanaExtension.Shared.Model
 {
-    public abstract class UserTask
+    public class UserTask
     {
         public const string execute = "Execute";
         public const string toggle_listening = "Toggle Listening";
@@ -15,12 +15,45 @@ namespace CortanaExtension.Shared.Model
         public string Name { get; set; }
         public ObservableCollection<UserTask> Tasks = new ObservableCollection<UserTask>();
 
+        public UserTask()
+        {
+
+        }
+
         public UserTask(string name)
         {
             Name = name;
         }
 
-        public abstract void Perform();
+        public virtual void Perform()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Type GetType(string name)
+        {
+            switch(name)
+            {
+                case execute:
+                    return typeof(ExecuteUserTask);
+                case toggle_listening:
+                    return typeof(ToggleListeningUserTask);
+                default:
+                    return typeof(AggregateUserTask);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is UserTask))
+            {
+                return false;
+            }
+
+            UserTask ut = obj as UserTask;
+            bool sameName = this.Name.Equals(ut.Name);
+            return sameName;
+        }
     }
 
     public class AggregateUserTask : UserTask
