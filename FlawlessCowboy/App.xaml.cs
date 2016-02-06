@@ -57,6 +57,7 @@ namespace FlawlessCowboy
             }
             catch (Exception ex)
             {
+                Model = new SharedModel();
                 Debug.WriteLine(ex.Message);
             }
         }

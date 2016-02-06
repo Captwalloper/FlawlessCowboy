@@ -4,59 +4,92 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using FlawlessCowboy.View;
 using static CortanaExtension.Shared.Utility.FileHelper;
+using CortanaExtension.Shared.Model;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace FlawlessCowboy.ViewModel
 {
     public class MainViewModel : AppViewModel<FlawlessCowboy.View.MainPage>
     {
-        private string rawText = "";
-        public string RawText
+
+        private UserCortanaCommand UserCommand { get; set; }
+
+        private ObservableCollection<UserTask> availableTasks = null;
+        public ObservableCollection<UserTask> AvailableTasks
         {
-            get { return rawText; }
+            get { return availableTasks; }
             set
             {
-                if (value != rawText) {
-                    rawText = Sanitize(value);
-                    OnPropertyChanged("RawText");
+                if (value != null && !value.Equals(availableTasks))
+                {
+                    availableTasks = value;
+                    OnPropertyChanged("AvailableTasks");
                 }
             }
         }
 
-        private string commandName = "";
-        public string CommandName
+        public ObservableCollection<UserTask> ComponentTasks
         {
-            get { return commandName; }
+            get { return UserCommand.Task.Tasks; }
             set
             {
-                if (value != commandName) {
-                    commandName = Sanitize(value);
-                    OnPropertyChanged("CommandName");
+                if (value != null && !value.Equals(UserCommand.Task.Tasks))
+                {
+                    UserCommand.Task.Tasks = value;
+                    OnPropertyChanged("ComponentTasks");
                 }
             }
         }
 
-        private string commandArg = "";
-        public string CommandArg
+        public string Name
         {
-            get { return commandArg; }
+            get { return UserCommand.Name; }
             set
             {
-                if (value != commandArg) {
-                    commandArg = Sanitize(value);
-                    OnPropertyChanged("CommandArg");
+                if (value != null && !value.Equals(UserCommand.Name))
+                {
+                    UserCommand.Name = value;
+                    OnPropertyChanged("Name");
                 }
             }
         }
 
-        private string commandMode = "";
-        public string CommandMode
+        public string ListenFor
         {
-            get { return commandMode; }
+            get { return UserCommand.ListenFor; }
             set
             {
-                if (value != commandMode) {
-                    commandMode = Sanitize(value);
-                    OnPropertyChanged("CommandMode");
+                if (value != null && !value.Equals(UserCommand.ListenFor))
+                {
+                    UserCommand.ListenFor = value;
+                    OnPropertyChanged("ListenFor");
+                }
+            }
+        }
+
+        public string Feedback
+        {
+            get { return UserCommand.Feedback; }
+            set
+            {
+                if (value != null && !value.Equals(UserCommand.Feedback))
+                {
+                    UserCommand.Feedback = value;
+                    OnPropertyChanged("Feedback");
+                }
+            }
+        }
+
+        public UserTask Task
+        {
+            get { return UserCommand.Task; }
+            set
+            {
+                if (value != null && !value.Equals(UserCommand.Task))
+                {
+                    UserCommand.Task = value;
+                    OnPropertyChanged("Task");
                 }
             }
         }
@@ -77,9 +110,11 @@ namespace FlawlessCowboy.ViewModel
         }
 
 
-        public MainViewModel(MainPage page)
+        public MainViewModel(MainPage page, UserCortanaCommand ucc, ObservableCollection<UserTask> availableTasks)
         {
             ViewPage = page;
+            UserCommand = ucc;
+            AvailableTasks = availableTasks;
         }
 
 
@@ -93,11 +128,17 @@ namespace FlawlessCowboy.ViewModel
             return inputString.Trim();
         }
 
-        private static async void Test()
+        private async void Test()
+        {
+            //await PopupHelper.ShowPopup(UserCommand.Name);
+            Name = "yay";
+        }
+
+        private static async void TestFileIO()
         {
             const string filename = "sample.txt";
-            //await FileHelper.CreateFile(filename);
-            //await FileHelper.WriteTo(filename, "booyah");
+            await FileHelper.CreateFile(filename, StorageFolders.LocalFolder);
+            await FileHelper.WriteTo(filename, StorageFolders.LocalFolder, "booyah");
             string text = await FileHelper.ReadFrom(filename, StorageFolders.LocalFolder);
             await PopupHelper.ShowPopup(text);
         }

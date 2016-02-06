@@ -1,5 +1,8 @@
-﻿using CortanaExtension.Shared.Utility.Cortana;
+﻿using CortanaExtension.Shared.Model;
+using CortanaExtension.Shared.Utility.Cortana;
 using FlawlessCowboy.ViewModel;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
@@ -12,18 +15,32 @@ namespace FlawlessCowboy.View
     /// </summary>
     public sealed partial class MainPage : Page, IAppPage
     {
-        public MainViewModel viewModel;
+        public MainViewModel ViewModel;
+
+        //testing
+        private UserCortanaCommand UCC = new UserCortanaCommand("test", new AggregateUserTask("Test", new ExecuteUserTask()));
+        private ObservableCollection<UserTask> AvailableTasks = new ObservableCollection<UserTask>();
 
         public MainPage()
         {
             this.InitializeComponent();
-            viewModel = new MainViewModel(this);
-            this.DataContext = viewModel;
+            InitTest();
+            ViewModel = new MainViewModel(this, UCC, AvailableTasks);
+            this.DataContext = ViewModel;
         }
 
         async Task IAppPage.RespondToVoice(CortanaCommand command)
         {
-            await viewModel.RespondToVoice(command);
+            await ViewModel.RespondToVoice(command);
+        }
+
+        private void InitTest()
+        {
+            AvailableTasks.Add(new ExecuteUserTask());
+            AvailableTasks.Add(new ToggleListeningUserTask());
+            UCC.ListenFor = "yay";
+            UCC.Feedback = "booyah!";
+
         }
     }
 }
