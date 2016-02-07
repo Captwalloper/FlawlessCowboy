@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CortanaExtension.Shared.Model;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -7,7 +8,7 @@ using static CortanaExtension.Shared.Utility.FileHelper;
 
 namespace CortanaExtension.Shared.Utility.Cortana
 {
-    public abstract class CortanaCommand
+    public class CortanaCommand
     {
         public const string Execute = "execute";
         public const string Notepad = "notepad";
@@ -23,7 +24,11 @@ namespace CortanaExtension.Shared.Utility.Cortana
         public string RawText { get; private set; }
         public string Mode { get; private set; }
 
-        protected CortanaCommand(string name, string argument, CommandDiagnostics diagnostics=null)
+        public CortanaCommand()
+        {
+        }
+
+        public CortanaCommand(string name, string argument, CommandDiagnostics diagnostics=null) : this()
         {
             Name = name;
             Argument = argument;
@@ -36,7 +41,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
             Name = name;
         }
 
-        public abstract Task Perform();
+        public virtual async Task Perform() { }
 
         protected string ProvideLaunchFeedback(string filename)
         {
@@ -52,6 +57,70 @@ namespace CortanaExtension.Shared.Utility.Cortana
             else {
                 RawText = Mode = null;
             }
+        }
+
+        //public CortanaCommand Spawn()
+        //{
+        //    var commands = SharedModel.InitPrebuiltCortanaCommands();
+        //    foreach (CortanaCommand command in commands)
+        //    {
+        //        if (Name.Equals(command.Name))
+        //        {
+        //            return (CortanaCommand)Reflection.Cast(this, command.GetType());
+        //        }
+        //    }
+        //    return null;
+        //}
+
+        public CortanaCommand UnPack()
+        {
+            switch (Name)
+            {
+                case Execute:
+                    return new ExecuteCortanaCommand(Argument);
+                case Notepad:
+                    return new NotepadCortanaCommand(Argument);
+                case YouTube:
+                    return new YoutubeCortanaCommand(Argument);
+                case ToggleListening:
+                    return new ToggleListeningCortanaCommand(Argument);
+                case FeedMe:
+                    return new FeedMeCortanaCommand(Argument);
+                case Calibrate:
+                    return new CalibrateCortanaCommand(Argument);
+                case BriefMe:
+                    return new BriefMeCortanaCommand(Argument);
+            }
+            return null;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is CortanaCommand))
+            {
+                return false;
+            }
+
+            CortanaCommand cc = obj as CortanaCommand;
+            bool sameName = this.Name.Equals(cc.Name);
+            bool sameArg = false;
+            if (Argument != null)
+            {
+                if (cc != null && cc.Argument != null)
+                {
+                    sameArg = this.Argument.Equals(cc.Argument);
+                }
+                sameArg = false;
+            } else
+            {
+                sameArg = cc != null && cc.Argument == null;
+            }
+            return sameName && sameArg;
+        }
+
+        public override string ToString()
+        {
+            return Name + " " + Argument;
         }
 
         public string ToInputString()
@@ -83,6 +152,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class ExecuteCortanaCommand : CortanaCommand
     {
         public ExecuteCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(Execute, argument, diagnostics) { /*Super constructor does everything*/ }
+        public ExecuteCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -95,6 +168,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class ToggleListeningCortanaCommand : CortanaCommand
     {
         public ToggleListeningCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(ToggleListening, argument, diagnostics) { /*Super constructor does everything*/ }
+        public ToggleListeningCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -106,6 +183,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class NotepadCortanaCommand : CortanaCommand
     {
         public NotepadCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(Notepad, argument, diagnostics) { /*Super constructor does everything*/ }
+        public NotepadCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -120,6 +201,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class YoutubeCortanaCommand : CortanaCommand
     {
         public YoutubeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(YouTube, argument, diagnostics) { /*Super constructor does everything*/ }
+        public YoutubeCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -134,6 +219,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class FeedMeCortanaCommand : CortanaCommand
     {
         public FeedMeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(FeedMe, argument, diagnostics) { /*Super constructor does everything*/ }
+        public FeedMeCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -145,6 +234,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class CalibrateCortanaCommand : CortanaCommand
     {
         public CalibrateCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(Calibrate, argument, diagnostics) { /*Super constructor does everything*/ }
+        public CalibrateCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {
@@ -156,6 +249,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public class BriefMeCortanaCommand : CortanaCommand
     {
         public BriefMeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(BriefMe, argument, diagnostics) { /*Super constructor does everything*/ }
+        public BriefMeCortanaCommand()
+        {
+
+        }
 
         public override async Task Perform()
         {

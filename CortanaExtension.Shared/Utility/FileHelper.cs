@@ -93,6 +93,23 @@ namespace CortanaExtension.Shared.Utility
             //await Launch("OpenFileExplorer.ahk", await StorageFolders.ResourceFiles());
         }
 
+        public static async Task EditVCD()
+        {
+            //string directory = StorageFolders.FlawlessCowboy.Path;
+            //ClipboardHelper.CopyToClipboard(directory);
+            //await Launch("Open_File_Explorer.ahk", StorageFolders.LocalFolder);
+
+            const string filename = Cortana.Cortana.vcdFilename;
+
+            StorageFolder folder = StorageFolders.FlawlessCowboy;
+            IStorageFile file = await folder.GetFileAsync(filename);
+
+            LauncherOptions options = new LauncherOptions();
+            options.DisplayApplicationPicker = true;
+
+            bool result = await Launcher.LaunchFileAsync(file, options);
+        }
+
         public static async Task CopyToFolder(IStorageFile file, StorageFolder source, StorageFolder dest)
         {
             string filename = file.Name;

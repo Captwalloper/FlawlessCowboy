@@ -54,8 +54,7 @@ namespace FlawlessCowboy
             CustomizeDebugSettings();
             InitializeFrame(e);
             await Cortana.Setup(this);
-            Model = await Load();
-            await Save();
+            //await Save();
             try {
                 await SetupLocalFolder(); //hack
             } catch (Exception ex) {
@@ -63,18 +62,18 @@ namespace FlawlessCowboy
             }
         }
 
-        //private static async Task StoreLocalFolderInResourceFiles()
-        //{
-        //    StorageFolder dest = await StorageFolders.ResourceFiles();
-        //    StorageFolder source = StorageFolders.LocalFolder;
-        //    var filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles());
-        //    IStorageFile file;
-        //    foreach (string filename in filenames)
-        //    {
-        //        file = await source.GetFileAsync(filename);
-        //        await FileHelper.CopyToFolder(file, source, dest);
-        //    }
-        //}
+        public static async Task StoreLocalFolderInResourceFiles()
+        {
+            StorageFolder dest = await StorageFolders.ResourceFiles();
+            StorageFolder source = StorageFolders.LocalFolder;
+            var filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles());
+            IStorageFile file;
+            foreach (string filename in filenames)
+            {
+                file = await source.GetFileAsync(filename);
+                await FileHelper.CopyToFolder(file, source, dest);
+            }
+        }
 
         public static async Task SetupLocalFolder()
         {
@@ -151,7 +150,7 @@ namespace FlawlessCowboy
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(FlawlessCowboy.View.MainPage), e.Arguments);
+                rootFrame.Navigate(typeof(FlawlessCowboy.View.MasterPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();
@@ -161,8 +160,10 @@ namespace FlawlessCowboy
         {
             DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
             IList<Type> knownTypes = new List<Type>();
-            knownTypes.Add(typeof(ExecuteUserTask));
-            knownTypes.Add(typeof(ToggleListeningUserTask));
+            foreach(CortanaCommand task in Model.AvailableTasks)
+            {
+                knownTypes.Add(task.GetType());
+            }
             settings.KnownTypes = knownTypes;
             string json = Serializer.Serialize(Model, settings);
             StorageFolder folder = StorageFolders.LocalFolder;
@@ -170,7 +171,7 @@ namespace FlawlessCowboy
             await FileHelper.WriteTo(modelFileName, folder, json);
         }
 
-        private async Task<SharedModel> Load()
+        public async Task<SharedModel> Load()
         {
             SharedModel model = new SharedModel();
             try {
@@ -181,6 +182,13 @@ namespace FlawlessCowboy
             }
             
             return model;
+        }
+
+        public static Page GetPage()
+        {
+            var frame = (Frame)Window.Current.Content;
+            var page = (Page)frame.Content;
+            return page;
         }
 
         /// <summary>

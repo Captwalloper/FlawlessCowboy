@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.Storage;
 using System;
+using Windows.UI.Xaml;
 
 namespace FlawlessCowboy.ViewModel
 {
@@ -17,8 +18,8 @@ namespace FlawlessCowboy.ViewModel
 
         private UserCortanaCommand UserCommand { get; set; }
 
-        private ObservableCollection<UserTask> availableTasks = null;
-        public ObservableCollection<UserTask> AvailableTasks
+        private ObservableCollection<CortanaCommand> availableTasks = null;
+        public ObservableCollection<CortanaCommand> AvailableTasks
         {
             get { return availableTasks; }
             set
@@ -31,14 +32,14 @@ namespace FlawlessCowboy.ViewModel
             }
         }
 
-        public ObservableCollection<UserTask> ComponentTasks
+        public ObservableCollection<CortanaCommand> ComponentTasks
         {
-            get { return UserCommand.Task.Tasks; }
+            get { return UserCommand.Tasks; }
             set
             {
-                if (value != null && !value.Equals(UserCommand.Task.Tasks))
+                if (value != null && !value.Equals(UserCommand.Tasks))
                 {
-                    UserCommand.Task.Tasks = value;
+                    UserCommand.Tasks = value;
                     OnPropertyChanged("ComponentTasks");
                 }
             }
@@ -83,36 +84,102 @@ namespace FlawlessCowboy.ViewModel
             }
         }
 
-        public UserTask Task
-        {
-            get { return UserCommand.Task; }
-            set
-            {
-                if (value != null && !value.Equals(UserCommand.Task))
-                {
-                    UserCommand.Task = value;
-                    OnPropertyChanged("Task");
-                }
-            }
-        }
-
         //Commands
 
-        private ICommand _launchCommand;
-        public ICommand LaunchCommand
+        private ICommand _scriptEditorCommand;
+        public ICommand ScriptEditorCommand
         {
             get
             {
-                return _launchCommand ?? (_launchCommand = new Command(Test));
+                return _scriptEditorCommand ?? (_scriptEditorCommand = new Command(OpenFileExplorer));
             }
             protected set
             {
-                _launchCommand = value;
+                _scriptEditorCommand = value;
+            }
+        }
+
+        private ICommand _saveScriptChanges;
+        public ICommand SaveScriptChanges
+        {
+            get
+            {
+                return _saveScriptChanges ?? (_saveScriptChanges = new Command(SaveChanges));
+            }
+            protected set
+            {
+                _saveScriptChanges = value;
             }
         }
 
 
-        public MainViewModel(MainPage page, UserCortanaCommand ucc, ObservableCollection<UserTask> availableTasks)
+        private ICommand _vcdEditorCommand;
+        public ICommand VCDEditorCommand
+        {
+            get
+            {
+                return _vcdEditorCommand ?? (_vcdEditorCommand = new Command(EditVCD));
+            }
+            protected set
+            {
+                _vcdEditorCommand = value;
+            }
+        }
+
+        private ICommand _installVCD;
+        public ICommand InstallVCD
+        {
+            get
+            {
+                return _installVCD ?? (_installVCD = new Command(InstallTheVCD));
+            }
+            protected set
+            {
+                _installVCD = value;
+            }
+        }
+
+        private ICommand _demoCommand;
+        public ICommand DemoCommand
+        {
+            get
+            {
+                return _demoCommand ?? (_demoCommand = new Command(Demo));
+            }
+            protected set
+            {
+                _demoCommand = value;
+            }
+        }
+
+        private ICommand _confirmCommand;
+        public ICommand ConfirmCommand
+        {
+            get
+            {
+                return _confirmCommand ?? (_confirmCommand = new Command(Confirm));
+            }
+            protected set
+            {
+                _confirmCommand = value;
+            }
+        }
+
+        private ICommand _deleteCommand;
+        public ICommand DeleteCommand
+        {
+            get
+            {
+                return _deleteCommand ?? (_deleteCommand = new Command(Delete));
+            }
+            protected set
+            {
+                _deleteCommand = value;
+            }
+        }
+
+
+        public MainViewModel(MainPage page, UserCortanaCommand ucc, ObservableCollection<CortanaCommand> availableTasks)
         {
             ViewPage = page;
             UserCommand = ucc;
@@ -130,11 +197,51 @@ namespace FlawlessCowboy.ViewModel
             return inputString.Trim();
         }
 
-        private async void Test()
+        public async void Confirm()
         {
-            //await App.SetupLocalFolder();
+            SharedModel model = (Application.Current as App).Model;
+            if (!model.UserCortanaCommands.Contains(UserCommand))
+            {
+                model.UserCortanaCommands.Add(UserCommand);
+            }
+            GoToMasterPage();
+        }
 
+        private async void Delete()
+        {
+            SharedModel model = (Application.Current as App).Model;
+            model.UserCortanaCommands.Remove(UserCommand);
+            GoToMasterPage();
+        }
+
+        private async void GoToMasterPage()
+        {
+            ViewPage.Frame.Navigate(typeof(MasterPage));
+        }
+
+        private async void OpenFileExplorer()
+        {
             await FileHelper.OpenFileExplorer();
+        }
+
+        private async void SaveChanges()
+        {
+            await App.StoreLocalFolderInResourceFiles();
+        }
+
+        private async void EditVCD()
+        {
+            await FileHelper.EditVCD();
+        }
+
+        private async void InstallTheVCD()
+        {
+            await Cortana.InstallVoiceCommands();
+        }
+
+        private async void Demo()
+        {
+            await VCDEditor.DoThing("dummy");
         }
 
         private static async void TestFileIO()

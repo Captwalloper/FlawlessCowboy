@@ -5,6 +5,7 @@ using FlawlessCowboy.ViewModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -19,15 +20,26 @@ namespace FlawlessCowboy.View
         public MainViewModel ViewModel;
 
         //testing
-        private UserCortanaCommand UCC = new UserCortanaCommand("test", new AggregateUserTask("Test", new ExecuteUserTask()));
-        private ObservableCollection<UserTask> AvailableTasks = new ObservableCollection<UserTask>();
+        private UserCortanaCommand UCC; // new UserCortanaCommand("test", new ExecuteCortanaCommand(""));
+        private ObservableCollection<CortanaCommand> AvailableTasks;
 
         public MainPage()
         {
             this.InitializeComponent();
-            InitTest();
+            InitAvailableTasks();
+            SharedModel model = (Application.Current as App).Model;
+            UCC = model.selected;
             ViewModel = new MainViewModel(this, UCC, AvailableTasks);
             this.DataContext = ViewModel;
+        }
+
+        private void InitAvailableTasks()
+        {
+            SharedModel model = (Application.Current as App).Model;
+            if (model == null) {
+                model = new SharedModel();
+            }
+            AvailableTasks = model.AvailableTasks;
         }
 
         async Task IAppPage.RespondToVoice(CortanaCommand command)
@@ -35,13 +47,5 @@ namespace FlawlessCowboy.View
             await ViewModel.RespondToVoice(command);
         }
 
-        private void InitTest()
-        {
-            AvailableTasks.Add(new ExecuteUserTask());
-            AvailableTasks.Add(new ToggleListeningUserTask());
-            UCC.ListenFor = "yay";
-            UCC.Feedback = "booyah!";
-
-        }
     }
 }

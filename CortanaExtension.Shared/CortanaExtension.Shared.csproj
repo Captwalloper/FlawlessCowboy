@@ -163,7 +163,6 @@
   <ItemGroup>
     <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\UserCortanaCommand.cs" />
-    <Compile Include="Model\UserTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ClipboardHelper.cs" />
     <Compile Include="Utility\Command.cs" />
@@ -174,7 +173,9 @@
     <Compile Include="Utility\FileHelper.cs" />
     <Compile Include="Utility\FileIO.cs" />
     <Compile Include="Utility\PopupHelper.cs" />
+    <Compile Include="Utility\Reflection.cs" />
     <Compile Include="Utility\Serializer.cs" />
+    <Compile Include="Utility\VCDEditor.cs" />
     <Content Include="Model\ResourceFiles\Cole_Protocol.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

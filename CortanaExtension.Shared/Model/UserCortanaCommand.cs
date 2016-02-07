@@ -1,4 +1,6 @@
 ﻿using CortanaExtension.Shared.Utility.Cortana;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.SpeechRecognition;
 
@@ -8,22 +10,40 @@ namespace CortanaExtension.Shared.Model
     {
         public string ListenFor { get; set; }
         public string Feedback { get; set; }
-        public UserTask Task { get; set; }
+        public ObservableCollection<CortanaCommand> Tasks = new ObservableCollection<CortanaCommand>();
 
-        public UserCortanaCommand(string name, UserTask task) : base(name)
+        public string TasksList
         {
-            Task = task;
+            get {
+                string display = "";
+                foreach(CortanaCommand task in Tasks)
+                {
+                    display += task.ToString() + "; ";
+                }
+                return display;
+            }
+        }
+
+        public UserCortanaCommand(string name, params CortanaCommand[] tasks) : base(name)
+        {
+            foreach (CortanaCommand task in tasks)
+            {
+                Tasks.Add(task);
+            }
         }
 
         public override async Task Perform()
         {
-            Task.Perform();
+            foreach (CortanaCommand task in Tasks)
+            {
+                await task.Perform();
+            }
         }
 
         public UserCortanaCommand Spawn(SpeechRecognitionResult speechRecognitionResult)
         {
             //TODO: use argument
-            UserCortanaCommand clone = new UserCortanaCommand(Name, Task);
+            UserCortanaCommand clone = new UserCortanaCommand(Name, Tasks.ToArray());
             return clone;
         }
 
@@ -38,4 +58,5 @@ namespace CortanaExtension.Shared.Model
             return sameName;
         }
     }
+
 }

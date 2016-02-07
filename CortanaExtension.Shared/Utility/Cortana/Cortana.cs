@@ -23,7 +23,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         /// <summary>
         /// Note: this class and the vcd file are heavily coupled.
         /// </summary>
-        private const string vcdFilename = "CortanaCommands.xml";
+        public const string vcdFilename = "CortanaCommands.xml";
 
         private static IModelHolder ModelHolder;
 
@@ -137,7 +137,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         /// <summary>
         /// Updates Cortana with new commands and phrases from a VCD file
         /// </summary>
-        private static async Task InstallVoiceCommands()
+        public static async Task InstallVoiceCommands()
         {
             StorageFile file = await StorageFolders.FlawlessCowboy.GetFileAsync(vcdFilename);
             await VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(file);

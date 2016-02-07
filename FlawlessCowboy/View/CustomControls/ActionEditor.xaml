@@ -22,6 +22,7 @@
     <Grid x:Name="container" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -30,7 +31,10 @@
         </Grid.ColumnDefinitions>
 
         <!-- Action Sequence -->
-        <Border Grid.Column="0">
+        <TextBlock Grid.Row="0" Text="Your Command's Effect" Margin="10, 0, 10, 20" />
+        
+        <Border Grid.Column="0" Grid.Row="1">
+
             <ListView x:Name="ActionSequence" ItemsSource="{Binding ComponentTasks}"
                         MinWidth="100"
                         SelectionMode="Extended"
@@ -47,11 +51,13 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+
         </Border>
         
 
         <!-- Edit Panel -->
-        <Border Grid.Column="1">
+        <Border Grid.Column="1" Grid.Row="1">
             <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>
@@ -63,20 +69,20 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <TextBlock Text="Action Editor" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <local:Entry Label="Name:" Value="{Binding Task.Name, Mode=TwoWay}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Command Editor" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <local:Entry Label="Argument:" Value="{Binding Task.Name, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
                     <Button HorizontalAlignment="Center"
-                            Content="Create New" />
-                    <Button HorizontalAlignment="Center"
-                            Content="Confirm" />
+                            Content="Confirm"
+                            Click="Button_Click"/>
                 </StackPanel>
 
 
                 <StackPanel Grid.Row="2">
                     <TextBlock 
-                    VerticalAlignment="Bottom"
-                    Text="Drop items here to remove them from Selection"
-                    TextWrapping="Wrap"/>
+                        VerticalAlignment="Bottom"
+                        Margin="10, 0, 10, 10"
+                        Text="Drop items here to remove them from Selection"
+                        TextWrapping="Wrap"/>
                     <TextBlock x:Name="TargetTextBlock" HorizontalAlignment="Center"
                         AllowDrop="True"
                         DragEnter="TargetTextBlock_DragEnter"
@@ -88,8 +94,10 @@
         </Border>
 
         <!-- Action Picker -->
-        <Border Grid.Column="2">
-            <ListView x:Name="ActionPicker" ItemsSource="{Binding AvailableTasks}"
+        <Border Grid.Column="2" Grid.Row="1">
+            <StackPanel>
+                <TextBlock Text="Command Building Blocks"/>
+                <ListView x:Name="ActionPicker" ItemsSource="{Binding AvailableTasks}"
                         AllowDrop="True" 
                         CanReorderItems="True" 
                         CanDragItems="True"
@@ -103,6 +111,8 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            </StackPanel>
+            
         </Border>
 
     </Grid>

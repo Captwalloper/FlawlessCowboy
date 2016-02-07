@@ -1,7 +1,11 @@
-﻿using CortanaExtension.Shared.Utility;
+﻿using CortanaExtension.Shared.Model;
+using CortanaExtension.Shared.Utility;
+using CortanaExtension.Shared.Utility.Cortana;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
@@ -9,7 +13,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace CortanaExtension.Utility
 {
-    public class DragDropHelper<T>
+    public class DragDropHelper<T> where T : CortanaCommand
     {
         private ObservableCollection<T> _reference;
         private ObservableCollection<T> _selection;
@@ -38,7 +42,12 @@ namespace CortanaExtension.Utility
         /// <param name="e"></param>
         public async void SourceListView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
         {
-            string json = Serializer.Serialize(e.Items.First());
+            var obj = e.Items.First();
+            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
+            List<Type> knownTypes = new List<Type>();
+            knownTypes.Add(obj.GetType());
+            settings.KnownTypes = knownTypes;
+            string json = Serializer.Serialize(obj, settings);
             e.Data.SetText(json);
             // As we want our Reference list to say intact, we only allow Copy
             e.Data.RequestedOperation = DataPackageOperation.Move;
@@ -75,8 +84,12 @@ namespace CortanaExtension.Utility
                 var def = e.GetDeferral();
                 var json = await e.DataView.GetTextAsync();
                 T obj = Serializer.Deserialize<T>(json);
+                obj = (T)obj.UnPack();
 
-                _selection.Add(obj);
+                if (!_target.Name.Equals(undeleteableListviewName))
+                {
+                    _selection.Add(obj);
+                }
                 if (!_source.Name.Equals(undeleteableListviewName)) {
                      _reference.Remove(obj); 
                 }
@@ -122,6 +135,7 @@ namespace CortanaExtension.Utility
             if (_deletedItem != null && !_source.Name.Equals(undeleteableListviewName))
             {
                 obj = Serializer.Deserialize<T>(_deletedItem);
+                obj = (T)obj.UnPack();
                 //_selection.Remove(_deletedItem);
                 _reference.Remove(obj);
                 //_selection.Remove(obj);

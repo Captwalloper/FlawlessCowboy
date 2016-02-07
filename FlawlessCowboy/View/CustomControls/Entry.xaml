@@ -26,8 +26,8 @@
     </UserControl.Resources>
 
     <StackPanel x:Name="container"  Orientation="Horizontal" >
-        <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding Label}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
     </StackPanel>
     
 </UserControl>

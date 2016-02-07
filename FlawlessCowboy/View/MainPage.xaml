@@ -6,7 +6,12 @@
     >
 
     <Page.Resources>
-        
+        <Style TargetType="StackPanel">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -20,11 +25,52 @@
 
             </StackPanel>
 
-            <local:ActionEditor ComponentTasks="{Binding ComponentTasks, Mode=TwoWay}"  Task="{Binding Task, Mode=TwoWay}" AvailableTasks="{Binding AvailableTasks, Mode=TwoWay}"/>
+            <local:ActionEditor 
+                MinHeight="400"
+                ComponentTasks="{Binding ComponentTasks, Mode=TwoWay}"  
+                Task="{Binding Task, Mode=TwoWay}" 
+                AvailableTasks="{Binding AvailableTasks, Mode=TwoWay}"/>
 
-            <Button HorizontalAlignment="Center" Margin="20,20,20,20"
-                    Content="TEST"
-                    Command="{Binding LaunchCommand}"/>
+            <Grid x:Name="container" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0" 
+                            HorizontalAlignment="Stretch" Margin="20,20,10,20"
+                            Content="Script Editor"
+                            Command="{Binding ScriptEditorCommand}"/>
+                    <Button Grid.Row="0" Grid.Column="1" 
+                            HorizontalAlignment="Stretch" Margin="10,20,20,20"
+                            Content="Save Changes"
+                            Command="{Binding SaveScriptChanges}"/>
+
+                    <Button Grid.Row="1" Grid.Column="0" 
+                            HorizontalAlignment="Stretch" Margin="20,20,10,20"
+                            Content="VCD Editor"
+                            Command="{Binding VCDEditorCommand}"/>
+                    <Button Grid.Row="1" Grid.Column="1" 
+                            HorizontalAlignment="Stretch" Margin="10,20,20,20"
+                            Content="Install"
+                            Command="{Binding InstallVCD}"/>
+
+                    <Button Grid.Row="2" Grid.Column="0" 
+                            HorizontalAlignment="Stretch" Margin="20,20,10,20"
+                            Content="DEMO"
+                            Command="{Binding DemoCommand}"/>
+                    <Button Grid.Row="2" Grid.Column="2" 
+                            HorizontalAlignment="Stretch" Margin="10,20,20,20"
+                            Content="Delete"
+                            Command="{Binding DeleteCommand}"
+                            />
+
+            </Grid>
 
         </StackPanel>
 

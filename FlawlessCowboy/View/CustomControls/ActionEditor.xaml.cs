@@ -9,6 +9,8 @@ using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using CortanaExtension.Utility;
+using CortanaExtension.Shared.Utility.Cortana;
+using FlawlessCowboy.ViewModel;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -16,31 +18,31 @@ namespace FlawlessCowboy.View.CustomControls
 {
     public sealed partial class ActionEditor : UserControl
     {
-        public ObservableCollection<UserTask> ComponentTasks
+        public ObservableCollection<CortanaCommand> ComponentTasks
         {
-            get { return (ObservableCollection<UserTask>)GetValue(ComponentTaskProperty); }
+            get { return (ObservableCollection<CortanaCommand>)GetValue(ComponentTaskProperty); }
             set { SetValue(ComponentTaskProperty, value); }
         }
         public static readonly DependencyProperty ComponentTaskProperty =
-            DependencyProperty.Register("ComponentTasks", typeof(ObservableCollection<UserTask>),
+            DependencyProperty.Register("ComponentTasks", typeof(ObservableCollection<CortanaCommand>),
               typeof(ActionEditor), new PropertyMetadata(""));
 
-        public UserTask Task
+        public CortanaCommand Task
         {
-            get { return (UserTask)GetValue(TaskProperty); }
+            get { return (CortanaCommand)GetValue(TaskProperty); }
             set { SetValue(TaskProperty, value); }
         }
         public static readonly DependencyProperty TaskProperty =
-            DependencyProperty.Register("Task", typeof(UserTask),
+            DependencyProperty.Register("Task", typeof(CortanaCommand),
               typeof(ActionEditor), new PropertyMetadata(""));
 
-        public ObservableCollection<UserTask> AvailableTasks
+        public ObservableCollection<CortanaCommand> AvailableTasks
         {
-            get { return (ObservableCollection<UserTask>)GetValue(AvailableTaskProperty); }
+            get { return (ObservableCollection<CortanaCommand>)GetValue(AvailableTaskProperty); }
             set { SetValue(AvailableTaskProperty, value); }
         }
         public static readonly DependencyProperty AvailableTaskProperty =
-            DependencyProperty.Register("AvailableTasks", typeof(ObservableCollection<UserTask>),
+            DependencyProperty.Register("AvailableTasks", typeof(ObservableCollection<CortanaCommand>),
               typeof(ActionEditor), new PropertyMetadata(""));
 
 
@@ -48,23 +50,23 @@ namespace FlawlessCowboy.View.CustomControls
 
 
 
-        private DragDropHelper<UserTask> DDH;
+        private DragDropHelper<CortanaCommand> DDH;
 
         public ActionEditor()
         {
             this.InitializeComponent();
             container.DataContext = this;
 
-            DDH = new DragDropHelper<UserTask>(ActionSequence, ActionPicker);
+            DDH = new DragDropHelper<CortanaCommand>(ActionSequence, ActionPicker);
         }
 
         private void SourceListView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
         {
             ListView source = sender as ListView;
             if (source.Equals(ActionSequence)) {
-                DDH = new DragDropHelper<UserTask>(ActionSequence, ActionPicker);
+                DDH = new DragDropHelper<CortanaCommand>(ActionSequence, ActionPicker);
             } else {
-                DDH = new DragDropHelper<UserTask>(ActionPicker, ActionSequence);
+                DDH = new DragDropHelper<CortanaCommand>(ActionPicker, ActionSequence);
             }
             DDH.SourceListView_DragItemsStarting(sender, e);
         }
@@ -97,6 +99,11 @@ namespace FlawlessCowboy.View.CustomControls
         private async void TargetTextBlock_Drop(object sender, DragEventArgs e)
         {
             DDH.TargetTextBlock_Drop(sender, e);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ((MainPage)App.GetPage()).ViewModel.Confirm();
         }
     }
 }

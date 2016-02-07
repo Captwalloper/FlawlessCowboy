@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="FlawlessCowboy.View.MasterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FlawlessCowboy.View.CustomControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Your Commands" HorizontalAlignment="Center" Margin="20, 20, 20 ,20"/>
+        
+            <ListView x:Name="CommandPicker" ItemsSource="{Binding UserCortanaCommands}" HorizontalAlignment="Center"
+                             SelectionChanged="CommandPicker_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
+                                    >
+                            <local:Entry Label="Name:" Value="{Binding Name, Mode=TwoWay}" />
+                            <local:Entry Label="SubCommands:" Value="{Binding TasksList, Mode=TwoWay}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+        
+        
+        <Button Grid.Row="1" Content="Add Command" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Command="{Binding AddCommand}"
+        />
+    </Grid>
+</Page>
