@@ -3,10 +3,13 @@ using CortanaExtension.Shared.Utility;
 using CortanaExtension.Shared.Utility.Cortana;
 using FlawlessCowboy.View;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -51,18 +54,42 @@ namespace FlawlessCowboy
             CustomizeDebugSettings();
             InitializeFrame(e);
             await Cortana.Setup(this);
-            try
-            {
-                await Load();
-            }
-            catch (Exception ex)
-            {
-                Model = new SharedModel();
+            Model = await Load();
+            await Save();
+            try {
+                await SetupLocalFolder(); //hack
+            } catch (Exception ex) {
                 Debug.WriteLine(ex.Message);
             }
         }
 
-        protected override void OnActivated(IActivatedEventArgs e)
+        //private static async Task StoreLocalFolderInResourceFiles()
+        //{
+        //    StorageFolder dest = await StorageFolders.ResourceFiles();
+        //    StorageFolder source = StorageFolders.LocalFolder;
+        //    var filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles());
+        //    IStorageFile file;
+        //    foreach (string filename in filenames)
+        //    {
+        //        file = await source.GetFileAsync(filename);
+        //        await FileHelper.CopyToFolder(file, source, dest);
+        //    }
+        //}
+
+        public static async Task SetupLocalFolder()
+        {
+            StorageFolder source = await StorageFolders.ResourceFiles();
+            StorageFolder dest = StorageFolders.LocalFolder;
+            var filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles());
+            IStorageFile file;
+            foreach (string filename in filenames)
+            {
+                file = await source.GetFileAsync(filename);
+                await FileHelper.CopyToFolder(file, source, dest);
+            }
+        }
+
+        protected async override void OnActivated(IActivatedEventArgs e)
         {
             IAppPage page = GetCurrentPage() as IAppPage;
 
@@ -70,11 +97,14 @@ namespace FlawlessCowboy
             switch (kind)
             {
                 case Windows.ApplicationModel.Activation.ActivationKind.VoiceCommand:
+
+                    //await Cortana.InstallFilenamePhrase();
+
                     RespondToForegroundVoiceCommand(e as VoiceCommandActivatedEventArgs, page);
                     break;
-                case ActivationKind.Protocol:
-                    RespondToBackgroundVoiceCommand(e as ProtocolActivatedEventArgs, page);
-                    break;
+                //case ActivationKind.Protocol:
+                //    RespondToBackgroundVoiceCommand(e as ProtocolActivatedEventArgs, page);
+                //    break;
             }
         }
 
@@ -129,14 +159,28 @@ namespace FlawlessCowboy
 
         private async Task Save()
         {
-            string json = Serializer.Serialize(Model);
-            await FileHelper.WriteTo(modelFileName, await StorageFolders.ResourceFiles(), json);
+            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
+            IList<Type> knownTypes = new List<Type>();
+            knownTypes.Add(typeof(ExecuteUserTask));
+            knownTypes.Add(typeof(ToggleListeningUserTask));
+            settings.KnownTypes = knownTypes;
+            string json = Serializer.Serialize(Model, settings);
+            StorageFolder folder = StorageFolders.LocalFolder;
+            await FileHelper.CreateFile(modelFileName, folder);
+            await FileHelper.WriteTo(modelFileName, folder, json);
         }
 
-        private async Task Load()
+        private async Task<SharedModel> Load()
         {
-            string json = await FileHelper.ReadFrom(modelFileName, await StorageFolders.ResourceFiles());
-            Model = Serializer.Deserialize<SharedModel>(json);
+            SharedModel model = new SharedModel();
+            try {
+                string json = await FileHelper.ReadFrom(modelFileName, await StorageFolders.ResourceFiles());
+                model = Serializer.Deserialize<SharedModel>(json);
+            } catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+            }
+            
+            return model;
         }
 
         /// <summary>
@@ -152,6 +196,7 @@ namespace FlawlessCowboy
 
             //TODO: Save application state and stop any background activity
             await Save();
+            //await StoreLocalFolderInResourceFiles();
 
             deferral.Complete();
         }

@@ -15,13 +15,18 @@ namespace CortanaExtension.Shared.Model
         public SharedModel()
         {
             InitAvailableTasks();
+            InitUserCortanaCommands();
         }
 
         private void InitAvailableTasks()
         {
             AvailableTasks.Add( new ExecuteUserTask() );
             AvailableTasks.Add( new ToggleListeningUserTask() );
+        }
 
+        private void InitUserCortanaCommands()
+        {
+            
         }
     }
 }

@@ -10,9 +10,14 @@ namespace CortanaExtension.Shared.Utility
 {
     public static class Serializer
     {
-        public static string Serialize(object obj)
+        public static string Serialize(object obj, DataContractJsonSerializerSettings settings=null)
         {
-            DataContractJsonSerializer jsonizer = new DataContractJsonSerializer(obj.GetType());
+            if (obj == null) {
+                throw new NullReferenceException();
+            }
+
+            settings = settings ?? new DataContractJsonSerializerSettings();
+            DataContractJsonSerializer jsonizer = new DataContractJsonSerializer(obj.GetType(), settings);
             string jsonString = null;
             using ( MemoryStream stream = new MemoryStream() )
             {
@@ -26,6 +31,7 @@ namespace CortanaExtension.Shared.Utility
 
         public static T Deserialize<T>(string jsonString)
         {
+            //DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
             DataContractJsonSerializer jsonizer = new DataContractJsonSerializer(typeof(T));
             T obj;
             using (Stream stream = GenerateStreamFromString(jsonString))

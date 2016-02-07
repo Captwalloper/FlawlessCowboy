@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
-  <CommandSet xml:lang="en-us" Name="CortanaCommandSet_en-us">
+  <CommandSet xml:lang="en-us" Name="FlawlessCowboyCortanaCommandSet_en-us">
     <CommandPrefix> Cortana </CommandPrefix>
     <Example> Execute Cole Protocol </Example>
     
     <Command Name="execute">
       <Example> Execute Cole Protocol  </Example>
-      <ListenFor> Execute {filename}  </ListenFor>
+      <ListenFor> Execute {filename} </ListenFor>
       <Feedback> Executing {filename} </Feedback>
       <Navigate/>
     </Command>
@@ -18,13 +18,48 @@
       <Navigate/>
     </Command>
 
+    <Command Name="feed_me">
+      <Example> Feed Me  </Example>
+      <ListenFor> Feed Me  </ListenFor>
+      <Feedback> Ordering Food... </Feedback>
+      <Navigate/>
+    </Command>
+
+    <Command Name="youtube">
+      <Example> YouTube BatMan  </Example>
+      <ListenFor> YouTube {dictatedFindText} </ListenFor>
+      <Feedback> YouTubing {dictatedFindText} </Feedback>
+      <Navigate/>
+    </Command>
+
+    <Command Name="notepad">
+      <Example> Notepad BatMan  </Example>
+      <ListenFor> Notepad {dictatedFindText} </ListenFor>
+      <Feedback> Notepadding {dictatedFindText} </Feedback>
+      <Navigate/>
+    </Command>
+
+    <Command Name="calibrate">
+      <Example> Calibrate </Example>
+      <ListenFor> Calibrate </ListenFor>
+      <Feedback> Initializing Calibration Procedure... </Feedback>
+      <Navigate/>
+    </Command>
+
+    <Command Name="brief_me">
+      <Example> Brief Me </Example>
+      <ListenFor> Brief Me </ListenFor>
+      <Feedback> Initializing Briefing Procedure... </Feedback>
+      <Navigate/>
+    </Command>
+
     <PhraseList Label="filename">
       <Item> Cole Protocol </Item>
     </PhraseList>
 
-    <!--<PhraseTopic Label="dictatedFindText" Scenario="Search">
-      --><!--<Subject>  </Subject>--><!--
-    </PhraseTopic>-->
+    <PhraseTopic Label="dictatedFindText" Scenario="Search">
+      <!--<Subject></Subject>-->
+    </PhraseTopic>
 
   </CommandSet>
 

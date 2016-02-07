@@ -10,7 +10,12 @@ namespace CortanaExtension.Shared.Utility.Cortana
     public abstract class CortanaCommand
     {
         public const string Execute = "execute";
+        public const string Notepad = "notepad";
+        public const string YouTube = "youtube";
         public const string ToggleListening = "toggle_listening";
+        public const string FeedMe = "feed_me";
+        public const string Calibrate = "calibrate";
+        public const string BriefMe = "brief_me";
 
         public string Name { get; set;  }
         public string Argument { get; set; }
@@ -58,7 +63,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         /// <summary>
         /// Removes the "Execute" from "Execute Notepad", for instance
         /// </summary>
-        private static string StripOffCommandName(string command, string textSpoken)
+        public static string StripOffCommandName(string command, string textSpoken)
         {
             string[] words = textSpoken.Split(null); // split based on spaces
             string commandArg = "";
@@ -83,7 +88,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         {
             string filename = Argument;
             string properFilename = FileHelper.ConvertToProperFilename(filename);
-            await FileHelper.Launch(properFilename, await StorageFolders.ResourceFiles());
+            await FileHelper.Launch(properFilename, StorageFolders.LocalFolder);
         }
     }
 
@@ -94,7 +99,68 @@ namespace CortanaExtension.Shared.Utility.Cortana
         public override async Task Perform()
         {
             string properFilename = "Cortana_Settings.ahk";
-            await FileHelper.Launch(properFilename, await StorageFolders.ResourceFiles());
+            await FileHelper.Launch(properFilename, StorageFolders.LocalFolder);
+        }
+    }
+
+    public class NotepadCortanaCommand : CortanaCommand
+    {
+        public NotepadCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(Notepad, argument, diagnostics) { /*Super constructor does everything*/ }
+
+        public override async Task Perform()
+        {
+            string text = Argument;
+            const string notepad = "Notepad";
+            string properFilename = FileHelper.ConvertToProperFilename(notepad);
+            ClipboardHelper.CopyToClipboard(text);
+            await FileHelper.Launch(properFilename);
+        }
+    }
+
+    public class YoutubeCortanaCommand : CortanaCommand
+    {
+        public YoutubeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(YouTube, argument, diagnostics) { /*Super constructor does everything*/ }
+
+        public override async Task Perform()
+        {
+            string searchTarget = Argument;
+            const string youtube = "YouTube";
+            string properFilename = FileHelper.ConvertToProperFilename(youtube);
+            ClipboardHelper.CopyToClipboard(searchTarget);
+            await FileHelper.Launch(properFilename);
+        }
+    }
+
+    public class FeedMeCortanaCommand : CortanaCommand
+    {
+        public FeedMeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(FeedMe, argument, diagnostics) { /*Super constructor does everything*/ }
+
+        public override async Task Perform()
+        {
+            string properFilename = "Macro.ahk";
+            await FileHelper.Launch(properFilename);
+        }
+    }
+
+    public class CalibrateCortanaCommand : CortanaCommand
+    {
+        public CalibrateCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(Calibrate, argument, diagnostics) { /*Super constructor does everything*/ }
+
+        public override async Task Perform()
+        {
+            string properFilename = "Calibrate.ahk";
+            await FileHelper.Launch(properFilename);
+        }
+    }
+
+    public class BriefMeCortanaCommand : CortanaCommand
+    {
+        public BriefMeCortanaCommand(string argument, CommandDiagnostics diagnostics = null) : base(BriefMe, argument, diagnostics) { /*Super constructor does everything*/ }
+
+        public override async Task Perform()
+        {
+            string properFilename = "Brief_Me.ahk";
+            await FileHelper.Launch(properFilename);
         }
     }
 

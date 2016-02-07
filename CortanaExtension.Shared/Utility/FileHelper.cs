@@ -30,6 +30,19 @@ namespace CortanaExtension.Shared.Utility
             return result;
         }
 
+        public static async Task<bool> Launch(string filename)
+        {
+            StorageFolder folder = StorageFolders.LocalFolder;
+            IStorageFile file = await folder.GetFileAsync(filename);
+
+            LauncherOptions options = new LauncherOptions();
+            //options.DisplayApplicationPicker = true;
+            //options.FallbackUri = GetUri(cole_protocol);
+
+            bool result = await Launcher.LaunchFileAsync(file, options);
+            return result;
+        }
+
         public static async Task CreateFile(string filename, StorageFolder folder)
         {
             // Create sample file; replace if exists.
@@ -54,24 +67,43 @@ namespace CortanaExtension.Shared.Utility
             return file;
         }
 
-        public static async Task<string[]> GetFiles(StorageFolder folder, string extension)
+        public static async Task<string[]> GetFiles(StorageFolder folder, string extension=null)
         {
+            if (extension == null) {
+                return await FileIO.GetFiles(folder);
+            }
             return await FileIO.GetFiles(folder, extension);
         }
 
         public static async Task CloseActive()
         {
-            await Launch("CloseActiveFile.ahk", await StorageFolders.ResourceFiles());
+            await Launch("CloseActiveFile.ahk", StorageFolders.LocalFolder);
         }
 
         public static async Task MaximizeActive()
         {
-            await Launch("Maximize.ahk", await StorageFolders.ResourceFiles());
+            await Launch("Maximize.ahk", StorageFolders.LocalFolder);
+        }
+
+        public static async Task OpenFileExplorer()
+        {
+            string directory = StorageFolders.LocalFolder.Path;
+            ClipboardHelper.CopyToClipboard(directory);
+            await Launch("Open_File_Explorer.ahk", StorageFolders.LocalFolder);
+            //await Launch("OpenFileExplorer.ahk", await StorageFolders.ResourceFiles());
+        }
+
+        public static async Task CopyToFolder(IStorageFile file, StorageFolder source, StorageFolder dest)
+        {
+            string filename = file.Name;
+            await FileHelper.CreateFile(filename, dest);
+            string content = await ReadFrom(filename, source);
+            await WriteTo(filename, dest, content);
         }
 
         public static async Task PlayFor(string filename, int msToPlayFor)
         {
-            await Launch(filename, await StorageFolders.ResourceFiles());
+            await Launch(filename, StorageFolders.LocalFolder);
             await MaximizeActive();
             await Task.Delay(msToPlayFor);
             await CloseActive();

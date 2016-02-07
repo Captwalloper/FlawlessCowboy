@@ -7,6 +7,8 @@ using static CortanaExtension.Shared.Utility.FileHelper;
 using CortanaExtension.Shared.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Windows.Storage;
+using System;
 
 namespace FlawlessCowboy.ViewModel
 {
@@ -130,8 +132,9 @@ namespace FlawlessCowboy.ViewModel
 
         private async void Test()
         {
-            //await PopupHelper.ShowPopup(UserCommand.Name);
-            Name = "yay";
+            //await App.SetupLocalFolder();
+
+            await FileHelper.OpenFileExplorer();
         }
 
         private static async void TestFileIO()

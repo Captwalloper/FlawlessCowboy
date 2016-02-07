@@ -68,11 +68,36 @@ namespace CortanaExtension.Shared.Utility.Cortana
             {
                 case CortanaCommand.Execute:
                     argument = GetPhraseArg(speechRecognitionResult, "filename"); // filename
+                    //argument = CortanaCommand.StripOffCommandName(voiceCommandName, textSpoken);
                     processedCommand = new ExecuteCortanaCommand(argument, diagnostics);
                     break;
 
                 case CortanaCommand.ToggleListening:
                     processedCommand = new ToggleListeningCortanaCommand(null, diagnostics); // no argument needed
+                    break;
+
+                case CortanaCommand.YouTube:
+                    const string youtube = "YouTube";
+                    argument = CortanaCommand.StripOffCommandName(youtube, textSpoken); // search text
+                    processedCommand = new YoutubeCortanaCommand(argument, diagnostics);
+                    break;
+
+                case CortanaCommand.Notepad:
+                    const string notepad = "Notepad";
+                    argument = CortanaCommand.StripOffCommandName(notepad, textSpoken); // text
+                    processedCommand = new NotepadCortanaCommand(argument, diagnostics);
+                    break;
+
+                case CortanaCommand.FeedMe:
+                    processedCommand = new FeedMeCortanaCommand(null, diagnostics); // no argument needed
+                    break;
+
+                case CortanaCommand.Calibrate:
+                    processedCommand = new CalibrateCortanaCommand(null, diagnostics); // no argument needed
+                    break;
+
+                case CortanaCommand.BriefMe:
+                    processedCommand = new BriefMeCortanaCommand(null, diagnostics); // no argument needed
                     break;
 
                 default:
@@ -106,7 +131,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
             ClipboardHelper.CopyToClipboard(rawInput);
             // Run the closest thing to Cortana command line I have
             const string filename = "Cortanahk.ahk";
-            await FileHelper.Launch(filename, await StorageFolders.ResourceFiles());
+            await FileHelper.Launch(filename, StorageFolders.LocalFolder);
         }
 
         /// <summary>
@@ -116,6 +141,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         {
             StorageFile file = await StorageFolders.FlawlessCowboy.GetFileAsync(vcdFilename);
             await VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(file);
+            Task.Delay(500); //HACK
         }
 
         private static async Task InstallPhrases()
@@ -123,10 +149,10 @@ namespace CortanaExtension.Shared.Utility.Cortana
             await InstallFilenamePhrase();
         }
 
-        private static async Task InstallFilenamePhrase()
+        public static async Task InstallFilenamePhrase()
         {
             // Get the names of the files of interest (right now, the autohotkey files in the resource folder)
-            string[] filenames = await FileHelper.GetFiles(await StorageFolders.ResourceFiles(), ".ahk");
+            string[] filenames = await FileHelper.GetFiles(StorageFolders.LocalFolder, ".ahk");
 
             // colloquialize (so you don't have to say the underscore(s) and extension aloud)
             for (int i = 0; i < filenames.Length; i++)
@@ -146,7 +172,7 @@ namespace CortanaExtension.Shared.Utility.Cortana
         {
             try {
                 VoiceCommandDefinition commandDefinitions;
-                const string nameTag = "CortanaCommandSet_en-us"; // must match vcd file
+                const string nameTag = "FlawlessCowboyCortanaCommandSet_en-us"; // must match vcd file
                 bool commandDefFound = VoiceCommandDefinitionManager.InstalledCommandDefinitions.TryGetValue(nameTag, out commandDefinitions);
                 if (commandDefFound) {
                     await commandDefinitions.SetPhraseListAsync(phraseLabel, newList);
